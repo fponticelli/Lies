@@ -1,0 +1,11 @@
+-js bin/app.js
+-cp ../../src
+-cp src
+-lib thx.core
+-main Main
+-D html
+-debug
+-dce full
+-D analyzer
+
+-cmd node bin/app.js
