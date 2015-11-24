@@ -1,3 +1,12 @@
 package lies;
 
-typedef Reducer<State, Action> = State -> Action -> State;
+@:callable
+abstract Reducer<State, Action>(ReducerImpl<State, Action>) from ReducerImpl<State, Action> to ReducerImpl<State, Action> {
+  @:op(A+B)
+  public function compose(other : ReducerImpl<State, Action>)
+    return function(s, a) {
+      return other(this(s, a), a);
+    };
+}
+
+typedef ReducerImpl<State, Action> = State -> Action -> State;
