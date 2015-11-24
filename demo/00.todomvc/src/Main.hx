@@ -4,7 +4,7 @@ import thx.ReadonlyArray;
 
 class Main {
   static function main() {
-    var store = new Store(todoApp, {
+    var store = Store.create(todoApp, {
       visibilityFilter : ShowAll,
       todos : ReadonlyArray.empty()
     });

@@ -1,10 +1,14 @@
 package lies;
 
 class Store<State, Action> {
+  public static function create<State, Action>(reducer : Reducer<State, Action>, initialState : State) {
+    return new Store(reducer, initialState);
+  }
+
   var currentState : State;
   var reducer : Reducer<State, Action>;
   var listeners : Array<Listener>;
-  public function new(reducer : Reducer<State, Action>, initialState : State) {
+  function new(reducer : Reducer<State, Action>, initialState : State) {
     currentState = initialState;
     this.reducer = reducer;
     listeners = [];
@@ -33,5 +37,3 @@ class Store<State, Action> {
     }
   }
 }
-
-typedef Listener = Void -> Void;
