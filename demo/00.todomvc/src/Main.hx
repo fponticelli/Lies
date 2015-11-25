@@ -9,10 +9,10 @@ class Main {
       todos : ReadonlyArray.empty()
     });
 
-    trace("initial state", store.getState());
+    trace("initial state", store.state);
 
-    var unsubscribe = store.subscribe(function() {
-      trace(store.getState());
+    var unsubscribe = store.subscribe(function(state) {
+      trace(state);
     });
 
     store.dispatch(Add('Learn about actions'));

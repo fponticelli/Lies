@@ -1,4 +1,5 @@
 -lib thx.core
+-lib thx.promise
 -lib utest
 -js bin/test.js
 -cp src

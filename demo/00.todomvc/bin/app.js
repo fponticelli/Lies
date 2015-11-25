@@ -63,11 +63,16 @@ HxOverrides.remove = function(a,obj) {
 var Main = function() { };
 Main.__name__ = true;
 Main.main = function() {
-	var store = lies_Store.create(lies__$Reducer_Reducer_$Impl_$.fromPure(Reducers.todoApp),{ visibilityFilter : VisibilityFilter.ShowAll, todos : []});
-	haxe_Log.trace("initial state",{ fileName : "Main.hx", lineNumber : 12, className : "Main", methodName : "main", customParams : [store.getState()]});
-	var unsubscribe = store.subscribe(function() {
-		haxe_Log.trace(store.getState(),{ fileName : "Main.hx", lineNumber : 15, className : "Main", methodName : "main"});
-	});
+	var store = lies_Store.create(Reducers.todoApp,{ visibilityFilter : VisibilityFilter.ShowAll, todos : []});
+	haxe_Log.trace("initial state",{ fileName : "Main.hx", lineNumber : 12, className : "Main", methodName : "main", customParams : [store.state]});
+	var tmp;
+	var f = function(state) {
+		haxe_Log.trace(state,{ fileName : "Main.hx", lineNumber : 15, className : "Main", methodName : "main"});
+	};
+	tmp = function(state1,_,_1) {
+		f(state1);
+	};
+	var unsubscribe = store.subscribe(tmp);
 	store.dispatch(TodoAction.Add("Learn about actions"));
 	store.dispatch(TodoAction.Add("Learn about reducers"));
 	store.dispatch(TodoAction.Add("Learn about store"));
@@ -381,15 +386,8 @@ js_Boot.__string_rec = function(o,s) {
 		return String(o);
 	}
 };
-var lies__$Reducer_Reducer_$Impl_$ = {};
-lies__$Reducer_Reducer_$Impl_$.__name__ = true;
-lies__$Reducer_Reducer_$Impl_$.fromPure = function(f) {
-	return function(state,action,_) {
-		return f(state,action);
-	};
-};
 var lies_Store = function(reducer,initialState) {
-	this.currentState = initialState;
+	this.state = initialState;
 	this.reducer = reducer;
 	this.listeners = [];
 };
@@ -398,21 +396,19 @@ lies_Store.create = function(reducer,initialState) {
 	return new lies_Store(reducer,initialState);
 };
 lies_Store.prototype = {
-	getState: function() {
-		return this.currentState;
+	dispatch: function(action) {
+		if(null == action) throw new thx_Error("cannot dispatch a null action",null,{ fileName : "Store.hx", lineNumber : 20, className : "lies.Store", methodName : "dispatch"});
+		var oldState = this.state;
+		this.state = this.reducer(oldState,action);
+		this.invokeListeners(this.state,oldState,action);
 	}
-	,dispatch: function(action) {
-		if(null == action) throw new thx_Error("cannot dispatch a null action",null,{ fileName : "Store.hx", lineNumber : 23, className : "lies.Store", methodName : "dispatch"});
-		this.currentState = this.reducer(this.currentState,action,this);
-		this.invokeListeners();
-	}
-	,invokeListeners: function() {
+	,invokeListeners: function(currentState,oldState,action) {
 		var _g = 0;
 		var _g1 = this.listeners.slice();
 		while(_g < _g1.length) {
 			var listener = _g1[_g];
 			++_g;
-			listener();
+			listener(currentState,oldState,action);
 		}
 	}
 	,subscribe: function(listener) {
