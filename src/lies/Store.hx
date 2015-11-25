@@ -19,8 +19,11 @@ class Store<State, Action> {
     if(null == action)
       throw new thx.Error('cannot dispatch a null action');
     var oldState = state;
-    state = reducer(oldState, action);
+    var value = reducer(oldState, action);
+    state = value.state;
     invokeListeners(state, oldState, action);
+    for(future in value.actions)
+      future.then(dispatch);
   }
 
   function invokeListeners(currentState, oldState, action) {

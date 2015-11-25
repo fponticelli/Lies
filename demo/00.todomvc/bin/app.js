@@ -60,19 +60,31 @@ HxOverrides.remove = function(a,obj) {
 	a.splice(i,1);
 	return true;
 };
+HxOverrides.iter = function(a) {
+	return { cur : 0, arr : a, hasNext : function() {
+		return this.cur < this.arr.length;
+	}, next : function() {
+		return this.arr[this.cur++];
+	}};
+};
 var Main = function() { };
 Main.__name__ = true;
 Main.main = function() {
-	var store = lies_Store.create(Reducers.todoApp,{ visibilityFilter : VisibilityFilter.ShowAll, todos : []});
+	var store = lies_Store.create(function(state,action) {
+		var tmp;
+		var _0 = Reducers.todoApp(state,action);
+		tmp = { _0 : _0, _1 : []};
+		return tmp;
+	},{ visibilityFilter : VisibilityFilter.ShowAll, todos : []});
 	haxe_Log.trace("initial state",{ fileName : "Main.hx", lineNumber : 12, className : "Main", methodName : "main", customParams : [store.state]});
-	var tmp;
-	var f = function(state) {
-		haxe_Log.trace(state,{ fileName : "Main.hx", lineNumber : 15, className : "Main", methodName : "main"});
+	var tmp1;
+	var f = function(state1) {
+		haxe_Log.trace(state1,{ fileName : "Main.hx", lineNumber : 15, className : "Main", methodName : "main"});
 	};
-	tmp = function(state1,_,_1) {
-		f(state1);
+	tmp1 = function(state2,_,_1) {
+		f(state2);
 	};
-	var unsubscribe = store.subscribe(tmp);
+	var unsubscribe = store.subscribe(tmp1);
 	store.dispatch(TodoAction.Add("Learn about actions"));
 	store.dispatch(TodoAction.Add("Learn about reducers"));
 	store.dispatch(TodoAction.Add("Learn about store"));
@@ -287,6 +299,11 @@ haxe_Log.__name__ = true;
 haxe_Log.trace = function(v,infos) {
 	js_Boot.__trace(v,infos);
 };
+var haxe_ds_Option = { __ename__ : true, __constructs__ : ["Some","None"] };
+haxe_ds_Option.Some = function(v) { var $x = ["Some",0,v]; $x.__enum__ = haxe_ds_Option; $x.toString = $estr; return $x; };
+haxe_ds_Option.None = ["None",1];
+haxe_ds_Option.None.toString = $estr;
+haxe_ds_Option.None.__enum__ = haxe_ds_Option;
 var js__$Boot_HaxeError = function(val) {
 	Error.call(this);
 	this.val = val;
@@ -399,8 +416,16 @@ lies_Store.prototype = {
 	dispatch: function(action) {
 		if(null == action) throw new thx_Error("cannot dispatch a null action",null,{ fileName : "Store.hx", lineNumber : 20, className : "lies.Store", methodName : "dispatch"});
 		var oldState = this.state;
-		this.state = this.reducer(oldState,action);
+		var value = this.reducer(oldState,action);
+		this.state = value._0;
 		this.invokeListeners(this.state,oldState,action);
+		var _g = 0;
+		var _g1 = value._1;
+		while(_g < _g1.length) {
+			var future = _g1[_g];
+			++_g;
+			future.then($bind(this,this.dispatch));
+		}
 	}
 	,invokeListeners: function(currentState,oldState,action) {
 		var _g = 0;
@@ -420,6 +445,9 @@ lies_Store.prototype = {
 		};
 	}
 };
+var thx_Either = { __ename__ : true, __constructs__ : ["Left","Right"] };
+thx_Either.Left = function(value) { var $x = ["Left",0,value]; $x.__enum__ = thx_Either; $x.toString = $estr; return $x; };
+thx_Either.Right = function(value) { var $x = ["Right",1,value]; $x.__enum__ = thx_Either; $x.toString = $estr; return $x; };
 var thx_Error = function(message,stack,pos) {
 	Error.call(this,message);
 	this.message = message;
@@ -455,6 +483,31 @@ thx_Error.prototype = $extend(Error.prototype,{
 		return this.message + "\nfrom: " + this.pos.className + "." + this.pos.methodName + "() at " + this.pos.lineNumber + "\n\n" + haxe_CallStack.toString(this.stackItems);
 	}
 });
+var thx_promise_Future = function() { };
+thx_promise_Future.__name__ = true;
+thx_promise_Future.prototype = {
+	then: function(handler) {
+		this.handlers.push(handler);
+		this.update();
+		return this;
+	}
+	,update: function() {
+		{
+			var _g = this.state;
+			switch(_g[1]) {
+			case 1:
+				break;
+			case 0:
+				var index = -1;
+				while(++index < this.handlers.length) this.handlers[index](_g[2]);
+				this.handlers = [];
+				break;
+			}
+		}
+	}
+};
+var $_, $fid = 0;
+function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
 if(Array.prototype.indexOf) HxOverrides.indexOf = function(a,o,i) {
 	return Array.prototype.indexOf.call(a,o,i);
 };
