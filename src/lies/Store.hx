@@ -19,7 +19,9 @@ class Store<State, Action> {
   }
 
   public function dispatch(action : Action) : Void {
-    currentState = reducer(currentState, action);
+    if(null == action)
+      throw new thx.Error('cannot dispatch a null action');
+    currentState = reducer(currentState, action, this);
     invokeListeners();
   }
 
