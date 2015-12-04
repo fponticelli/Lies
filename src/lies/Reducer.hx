@@ -8,7 +8,7 @@ import thx.Tuple;
 abstract Reducer<State, Action>(ReducerImpl<State, Action>) from ReducerImpl<State, Action> to ReducerImpl<State, Action> {
   @:from
   inline public static function fromPure<State, Action>(f : State -> Action -> State) : Reducer<State, Action>
-    return function(state : State, action : Action) : ReducerValue<State, Action>
+    return function(state : State, action : Action) : Reduced<State, Action>
       return new Tuple(f(state, action), []);
 
   @:op(A+B)
@@ -20,4 +20,4 @@ abstract Reducer<State, Action>(ReducerImpl<State, Action>) from ReducerImpl<Sta
     };
 }
 
-typedef ReducerImpl<State, Action> = State -> Action -> ReducerValue<State, Action>;
+typedef ReducerImpl<State, Action> = State -> Action -> Reduced<State, Action>;
