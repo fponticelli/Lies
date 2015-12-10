@@ -22,7 +22,7 @@ abstract Reduced<State, Action>(Tuple<State, Array<Future<Action>>>) from Tuple<
     return withFutures([action]);
 
   public function withFutures(actions : Array<Future<Action>>) : Reduced<State, Action>
-    return new Tuple(state, actions.concat(actions));
+    return new Tuple(state, this.right.concat(actions));
 
   inline function get_state()
     return this.left;
