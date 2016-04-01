@@ -1,9 +1,8 @@
 package lies;
 
 class Store<State, Action> {
-  public static function create<State, Action>(reducer : Reducer<State, Action>, initialState : State) {
+  public static function create<State, Action>(reducer : Reducer<State, Action>, initialState : State) : Store<State, Action>
     return new Store(reducer, initialState);
-  }
 
   public var state(default, null) : State;
 
